@@ -254,8 +254,10 @@ export function hsvToRgb(h: number, s: number, v: number): RGBA {
     g = 0,
     b = 0
 
-  const i = Math.floor(h / 60) % 6
-  const f = h / 60 - Math.floor(h / 60)
+  // Hue wraps at 360 degrees, as in the native hsvToRgb.
+  const hue = ((h % 360) + 360) % 360
+  const i = Math.floor(hue / 60) % 6
+  const f = hue / 60 - Math.floor(hue / 60)
   const p = v * (1 - s)
   const q = v * (1 - f * s)
   const t = v * (1 - (1 - f) * s)

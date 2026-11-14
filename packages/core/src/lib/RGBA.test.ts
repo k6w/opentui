@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test"
-import { RGBA, ansi256IndexToRgb, hexToRgb, normalizeColorValue, parseColor, rgbToHex } from "./RGBA.js"
+import { RGBA, ansi256IndexToRgb, hexToRgb, hsvToRgb, normalizeColorValue, parseColor, rgbToHex } from "./RGBA.js"
 
 describe("RGBA", () => {
   test("uses packed Uint16 transport", () => {
@@ -46,6 +46,14 @@ describe("RGBA", () => {
     expect(hexToRgb("#F808").toInts()).toEqual([255, 136, 0, 136])
     expect(parseColor("transparent").toInts()).toEqual([0, 0, 0, 0])
     expect(rgbToHex(RGBA.fromInts(255, 128, 64, 128))).toBe("#ff804080")
+  })
+
+  test("wraps hue in hsvToRgb", () => {
+    expect(hsvToRgb(-30, 1, 1).toInts()).toEqual(hsvToRgb(330, 1, 1).toInts())
+    expect(hsvToRgb(-90, 1, 1).toInts()).toEqual(hsvToRgb(270, 1, 1).toInts())
+    expect(hsvToRgb(-390, 1, 1).toInts()).toEqual(hsvToRgb(330, 1, 1).toInts())
+    expect(hsvToRgb(420, 1, 1).toInts()).toEqual(hsvToRgb(60, 1, 1).toInts())
+    expect(hsvToRgb(-30, 1, 1).toInts()).toEqual([255, 0, 128, 255])
   })
 
   test("normalizes ColorInput values", () => {
