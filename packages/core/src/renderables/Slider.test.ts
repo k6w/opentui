@@ -1,4 +1,4 @@
-import { test, expect, beforeEach, afterEach } from "bun:test"
+import { test, expect, beforeEach, afterEach, mock } from "bun:test"
 import { SliderRenderable, type SliderOptions } from "./Slider.js"
 import { createTestRenderer, type MockMouse, type TestRenderer } from "../testing/test-renderer.js"
 
@@ -77,6 +77,35 @@ test("SliderRenderable > Value-based API", async () => {
   expect(slider.value).toBe(80)
   slider.value = -Infinity
   expect(slider.value).toBe(20)
+})
+
+test("SliderRenderable > initial value is clamped to the range", async () => {
+  const onChange = mock()
+  const { slider: high } = await createSliderRenderable(currentRenderer, {
+    orientation: "horizontal",
+    min: 0,
+    max: 10,
+    value: 100,
+    width: 10,
+    height: 1,
+    onChange,
+  })
+  expect(high.value).toBe(10)
+  expect(await paintedThumbSize(high)).toBeGreaterThan(0)
+
+  high.value = 100
+  expect(high.value).toBe(10)
+  expect(onChange).not.toHaveBeenCalled()
+
+  const { slider: low } = await createSliderRenderable(currentRenderer, {
+    orientation: "horizontal",
+    min: 0,
+    max: 10,
+    value: -5,
+    width: 10,
+    height: 1,
+  })
+  expect(low.value).toBe(0)
 })
 
 test("SliderRenderable > Custom step size", async () => {

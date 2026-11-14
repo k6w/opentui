@@ -41,7 +41,7 @@ export class SliderRenderable extends Renderable {
       this._orientation = options.orientation
       this._min = options.min ?? defaultMin
       this._max = options.max ?? defaultMax
-      this._value = options.value ?? this._min
+      this._value = Math.max(this._min, Math.min(this._max, options.value ?? this._min))
       this._viewPortSize = options.viewPortSize ?? this.defaultViewPortSize()
       this._onChange = options.onChange
       this._backgroundColor = RGBA.clone(parseColor(options.backgroundColor || defaultTrackBackgroundColor))
