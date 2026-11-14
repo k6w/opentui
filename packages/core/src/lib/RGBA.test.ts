@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test"
+import { describe, expect, spyOn, test } from "bun:test"
 import { RGBA, ansi256IndexToRgb, hexToRgb, normalizeColorValue, parseColor, rgbToHex } from "./RGBA.js"
 
 describe("RGBA", () => {
@@ -46,6 +46,17 @@ describe("RGBA", () => {
     expect(hexToRgb("#F808").toInts()).toEqual([255, 136, 0, 136])
     expect(parseColor("transparent").toInts()).toEqual([0, 0, 0, 0])
     expect(rgbToHex(RGBA.fromInts(255, 128, 64, 128))).toBe("#ff804080")
+  })
+
+  test("treats Object.prototype keys as unknown color names", () => {
+    const warn = spyOn(console, "warn").mockImplementation(() => {})
+    try {
+      for (const name of ["constructor", "__proto__", "Constructor"]) {
+        expect(parseColor(name).toInts()).toEqual([255, 0, 255, 255])
+      }
+    } finally {
+      warn.mockRestore()
+    }
   })
 
   test("normalizes ColorInput values", () => {
